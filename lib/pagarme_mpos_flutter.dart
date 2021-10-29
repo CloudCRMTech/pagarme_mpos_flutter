@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 class PagarmeMpos {
-
   MethodChannel _channel = const MethodChannel('pagarme_mpos_flutter');
   EventChannel _eventChannel = const EventChannel('mpos_stream');
-  Stream<dynamic> _mposEventStream;
+  Stream<dynamic>? _mposEventStream;
 
   final Map<PaymentMethod, List<String>> cardBrandsByPaymentMethod = {
     PaymentMethod.CreditCard: [
@@ -63,7 +62,7 @@ class PagarmeMpos {
   }
 
   Future<bool> payAmount(int amount, PaymentMethod paymentMethod) async {
-    List<String> cardBrandList = cardBrandsByPaymentMethod[paymentMethod];
+    List<String>? cardBrandList = cardBrandsByPaymentMethod[paymentMethod];
     final bool result = await _channel.invokeMethod('payAmount', {
       'amount': amount,
       'cardBrandList': cardBrandList,
@@ -74,7 +73,7 @@ class PagarmeMpos {
 
   Future<bool> close(String message) async {
     final bool result =
-        await _channel.invokeMethod('close', { 'message': message });
+        await _channel.invokeMethod('close', {'message': message});
     return result;
   }
 
@@ -105,7 +104,7 @@ class PagarmeMpos {
     return result;
   }
 
-  Stream<dynamic> get events {
+  Stream<dynamic>? get events {
     if (_mposEventStream == null) {
       _mposEventStream =
           _eventChannel.receiveBroadcastStream().map<dynamic>((value) => value);
@@ -113,7 +112,7 @@ class PagarmeMpos {
     return _mposEventStream;
   }
 
-  int getPaymentMethodIdentifier(PaymentMethod paymentMethod) {
+  int? getPaymentMethodIdentifier(PaymentMethod paymentMethod) {
     switch (paymentMethod) {
       case PaymentMethod.CreditCard:
         return 1;
@@ -123,7 +122,6 @@ class PagarmeMpos {
         return null;
     }
   }
-
 }
 
 enum PaymentMethod { CreditCard, DebitCard }
